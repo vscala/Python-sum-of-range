@@ -1,38 +1,35 @@
 # Python quick sum(range(*args))
 def srange(*args) -> int:
-    """Sum over a range
+	"""Sum over a range
 	srange(stop) == sum(range(stop))
 	srange(start, stop) == sum(range(start, stop))
 	srange(start, stop, increment) == sum(range(start, stop, increment))
 	
-    Arguments:
-    start -- starting value of sum (inclusive)
-    stop -- stoppping value of sum (exclusive)
+	Arguments:
+	start -- starting value of sum (inclusive)
+	stop -- stoppping value of sum (exclusive)
 	increment -- increment between start and stop 
-    """
+	"""
 	if len(args) > 3:
-		raise TypeError(f'srange expected at most 3 arguments, got {len(args) + len(kwargs)}')
+		raise TypeError(f'srange expected at most 3 arguments, got {len(args)}')
 	if len(args) == 0:
 		raise TypeError('srange expected at least 1 argument, got 0')
 	
-	start, stop, increment = 0, None, 1
 	if len(args) == 1:
-		stop = args[0]
+		start, stop, increment = 0, args[0], 1
 	elif len(args) == 2:
-		start, stop = args
-	elif len(args) == 3:
+		start, stop, increment = args + (1,)
+	else:
 		start, stop, increment = args
-		if increment == 0:
-			raise ValueError("srange argument 3 must not be zero")
 	
+	if increment == 0:
+		raise ValueError("srange argument 3 must not be zero")
 	if start % 1 or stop % 1 or increment % 1: # should floating points be allowed?
 		raise TypeError("'float' object cannot be interpreted as an integer")
 	
-	if start == stop:
+	if increment > 0 and start >= stop:
 		return 0
-	if increment > 0 and start > stop:
-		return 0
-	if increment < 0 and start < stop:
+	if increment < 0 and start <= stop:
 		return 0
 	
 	if increment != 1:
@@ -56,5 +53,24 @@ if __name__ == "__main__":
 	for i in range(-10, 10):
 		for j in range(-10, 10):
 			for k in range(-10, 10):
-				if k:
-					assert srange(i, j, k) == sum(range(i, j, k))
+				if k: assert srange(i, j, k) == sum(range(i, j, k))
+	try:
+		srange()
+		assert False
+	except TypeError:
+		assert True
+	try:
+		srange(1, 2, 3, 4)
+		assert False
+	except TypeError:
+		assert True
+	try:
+		srange(1, 2, 0)
+		assert False
+	except ValueError:
+		assert True
+	try:
+		srange(.1)
+		assert False
+	except TypeError:
+		assert True
