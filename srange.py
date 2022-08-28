@@ -1,5 +1,15 @@
 # Python quick sum(range(*args))
-def srange(*args) -> float:
+def srange(*args) -> int:
+    """Sum over a range
+	srange(stop) == sum(range(stop))
+	srange(start, stop) == sum(range(start, stop))
+	srange(start, stop, increment) == sum(range(start, stop, increment))
+	
+    Arguments:
+    start -- starting value of sum (inclusive)
+    stop -- stoppping value of sum (exclusive)
+	increment -- increment between start and stop 
+    """
 	if len(args) > 3:
 		raise TypeError(f'srange expected at most 3 arguments, got {len(args) + len(kwargs)}')
 	if len(args) == 0:
@@ -25,28 +35,26 @@ def srange(*args) -> float:
 	if increment < 0 and start < stop:
 		return 0
 	
-	if increment < 0:
-		return srange(stop+1, start+1, -increment)
-	if increment > 1: # TODO handle increments > 1
-		# caclulate starting and stoppping points
-		
-		return None #increment * srange(start//increment, stop//increment) ???
+	if increment != 1:
+		range_offset = start % increment
+		start -= range_offset
+		stop -= range_offset
+		solution_offset = -((stop - start) // -increment) * range_offset
+		return solution_offset + increment * srange(start // increment, -(stop // -increment))
 	
 	if stop < 0:
 		return -srange(-stop+1, -start+1)
 	
-	# adaptation of https://en.wikipedia.org/wiki/Triangular_number
+	# Adaptation of https://en.wikipedia.org/wiki/Triangular_number
 	return (stop * (stop - 1) - start * (start - 1)) >> 1
-	
+
 if __name__ == "__main__":
 	for start in range(-100, 100):
 		assert srange(start) == sum(range(start))
 		for stop in range(-100, 100):
 			assert srange(start, stop) == sum(range(start, stop))
-	from datetime import datetime
-	now = datetime.now()
-	for start in range(-1000, 1000):
-		srange(start)
-		for stop in range(-1000, 1000):
-			srange(start, stop)
-	print(datetime.now() - now)
+	for i in range(-10, 10):
+		for j in range(-10, 10):
+			for k in range(-10, 10):
+				if k:
+					assert srange(i, j, k) == sum(range(i, j, k))
